@@ -69,6 +69,8 @@ function CustomVideoPlayer({ src, poster }) {
 export default function App() {
   const [isEnvelopeOpened, setIsEnvelopeOpened] = useState(false);
   const [showMain, setShowMain] = useState(false);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const musicRef = useRef(null);
 
   const PHOTOS = [
     { id: 1, src: '/images/photo3.jpg', classes: 'absolute top-[16%] left-[4%] sm:left-[8%] w-[45%] sm:w-[32%]', rotate: -8 },
@@ -83,8 +85,27 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const toggleMusic = () => {
+    if (!musicRef.current) return;
+
+    if (musicRef.current.paused) {
+      musicRef.current.play().catch(() => {});
+    } else {
+      musicRef.current.pause();
+    }
+  };
+
   return (
     <div className={`w-full bg-[#8c657a] text-white ${showMain ? 'overflow-y-auto' : 'h-screen overflow-hidden'}`}>
+      <audio
+        ref={musicRef}
+        src="/audio/birthday-song.mp3"
+        autoPlay
+        loop
+        preload="auto"
+        onPlay={() => setIsMusicPlaying(true)}
+        onPause={() => setIsMusicPlaying(false)}
+      />
       
       {/* ================= SECTION 1: THE ENVELOPE ================= */}
       <AnimatePresence>
@@ -105,7 +126,10 @@ export default function App() {
 
             <div 
               className="relative flex items-center justify-center w-full max-w-sm cursor-pointer mt-6"
-              onClick={() => setIsEnvelopeOpened(true)}
+              onClick={() => {
+                setIsEnvelopeOpened(true);
+                musicRef.current?.play().catch(() => {});
+              }}
             >
               <motion.img 
                 src="/images/envelope-closed.png"
@@ -208,7 +232,7 @@ export default function App() {
             <p className="font-letter text-[11.5px] sm:text-[15px] lg:text-[17px] leading-[1.9] sm:leading-[2.2] font-bold text-[#4a362f]">
               Happy birthday🎂 
 To my special one❤️
-I just want you to know how grateful I am for you, for your heart,your laugh,and the way youale even ordinary days feel special.
+I just want you to know how grateful I am for you, for your heart,your laugh,and the way you make even ordinary days feel special.
 Being with you feels like home💗
 Happy birthday day my love❤️❤️
             </p>
@@ -282,6 +306,24 @@ Happy birthday day my love❤️❤️
         </div>
 
       </section>
+
+      {showMain && (
+        <motion.button
+          type="button"
+          onClick={toggleMusic}
+          aria-label={isMusicPlaying ? 'إيقاف الموسيقى' : 'تشغيل الموسيقى'}
+          title={isMusicPlaying ? 'إيقاف الموسيقى' : 'تشغيل الموسيقى'}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.94 }}
+          className="fixed bottom-5 right-12 z-[60] flex h-12 w-12 items-center justify-center rounded-full border border-[#f3e3ce]/40 bg-[#58323e] text-[#f3e3ce] shadow-xl transition-colors hover:bg-[#43232e] sm:right-20"
+        >
+          <svg aria-hidden="true" className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 18V5l12-2v13" />
+            <circle cx="6" cy="18" r="3" />
+            <circle cx="18" cy="16" r="3" />
+          </svg>
+        </motion.button>
+      )}
 
     </div>
   );
